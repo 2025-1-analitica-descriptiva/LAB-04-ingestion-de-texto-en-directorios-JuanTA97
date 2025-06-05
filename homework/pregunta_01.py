@@ -4,9 +4,53 @@
 """
 Escriba el codigo que ejecute la accion solicitada en cada pregunta.
 """
-
+#Importar librerias
+import zipfile
+import pandas as pd
+import glob
+import os
 
 def pregunta_01():
+
+    #Extraer datos
+    path = "files/input.zip"
+    destino = "files"
+    with zipfile.ZipFile(path, 'r') as fzip:
+        fzip.extractall(destino)
+
+    def load_input(input_directory):
+        secuence = []
+        files = glob.glob(f"{input_directory}/**/*.txt", recursive=True)
+        for file in files:
+            with open(file, encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    label = os.path.basename(os.path.dirname(file))
+                    secuence.append((line, label))
+        return secuence
+
+    #Creamos carpeta de salida
+    def output_directory(output_directory):
+        if os.path.exists(output_directory):
+            for file in glob.glob(f"{output_directory}/*"):
+                os.remove(file)
+            os.rmdir(output_directory)
+        os.makedirs(output_directory)
+    
+
+    #Guardamos en la carpeta de salida
+    def save_output(output_directory, secuence):
+        df = pd.DataFrame(secuence, columns=["phrase", "target"])
+        df.to_csv(f"{output_directory}", index=False)    
+    
+    output_directory("files/output")
+    
+    train_data = load_input("files/input/train")
+    test_data = load_input("files/input/test")
+    
+    save_output("files/output/train_dataset.csv", train_data)
+    save_output("files/output/test_dataset.csv", test_data)
+
     """
     La información requerida para este laboratio esta almacenada en el
     archivo "files/input.zip" ubicado en la carpeta raíz.
@@ -71,3 +115,4 @@ def pregunta_01():
 
 
     """
+pregunta_01()
